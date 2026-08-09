@@ -1,0 +1,17 @@
+layout {
+    tab name="agent" focus=true {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        pane split_direction="vertical" {
+            pane size="45%" focus=true name="Git / Shell"
+            pane size="55%" command="bash" {
+                args "-lc" "unset NO_COLOR; if command -v zellij-codex-launch >/dev/null 2>&1; then exec zellij-codex-launch --no-alt-screen --yolo; else exec codex --no-alt-screen --yolo; fi"
+                name "Codex"
+            }
+        }
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+    }
+}

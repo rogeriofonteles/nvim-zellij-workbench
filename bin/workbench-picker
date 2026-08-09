@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+editor_session="workbench-v2-editor"
+agent_session="workbench-v2-agent"
+
+for command_name in whiptail zellij; do
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    echo "workbench-picker requires $command_name." >&2
+    exit 1
+  fi
+done
+
+session_exists() {
+  local session="$1"
+  zellij list-sessions --short 2>/dev/null | grep -Fxq "$session"
+}
+
+if ! session_exists "$editor_session" || ! session_exists "$agent_session"; then
+  whiptail --title "Workbenches" --msgbox \
+    "No synchronized workbench projects are open yet.\n\nPress Alt+w from a project directory first." \
+    10 64
+  exit 0
+fi
+
+mapfile -t editor_tabs < <(zellij --session "$editor_session" action query-tab-names)
+mapfile -t agent_tabs < <(zellij --session "$agent_session" action query-tab-names)
+
+projects=()
+for editor_tab in "${editor_tabs[@]}"; do
+  for agent_tab in "${agent_tabs[@]}"; do
+    if [[ "$editor_tab" == "$agent_tab" ]]; then
+      projects+=("$editor_tab")
+      break
+    fi
+  done
+done
+
+if ((${#projects[@]} == 0)); then
+  whiptail --title "Workbenches" --msgbox \
+    "No synchronized project tabs were found." 8 56
+  exit 0
+fi
+
+menu_items=()
+for project in "${projects[@]}"; do
+  menu_items+=("$project" "Switch both workbench tabs")
+done
+
+selected="$(whiptail \
+  --title "Switch workbench project" \
+  --menu "Choose the project to show in both sessions:" \
+  20 72 10 \
+  "${menu_items[@]}" \
+  3>&1 1>&2 2>&3)" || exit 0
+
+[[ -n "$selected" ]] || exit 0
+zellij --session "$editor_session" action go-to-tab-name "$selected" >/dev/null
+zellij --session "$agent_session" action go-to-tab-name "$selected" >/dev/null

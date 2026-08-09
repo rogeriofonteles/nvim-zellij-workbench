@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workbench_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+project="${1:-$PWD}"
+project="$(cd "$project" && pwd)"
+session="work-$(basename "$project" | tr -cs '[:alnum:]_-' '-')"
+
+cd "$project"
+export ZELLIJ_WORKBENCH_CWD="$project"
+if [[ -n "${ZELLIJ:-}" ]]; then
+  exec zellij --layout "$workbench_root/layouts/workbench.kdl"
+else
+  exec zellij --session "$session" --layout "$workbench_root/layouts/workbench.kdl"
+fi

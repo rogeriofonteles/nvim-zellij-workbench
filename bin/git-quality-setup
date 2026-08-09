@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+git config --global merge.conflictStyle zdiff3
+git config --global diff.algorithm histogram
+git config --global rebase.autoSquash true
+git config --global rerere.enabled true
+
+echo "Configured zdiff3 conflicts, histogram diffs, autosquash, and rerere."
