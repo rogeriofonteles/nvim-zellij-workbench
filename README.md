@@ -40,11 +40,32 @@ Running the command for another repository creates its two tabs; running it
 again switches both windows back to those existing tabs without losing state.
 
 From Zellij, press `Alt w` to run `dual-workbench` for the focused pane's
-current directory. The binding is installed in `~/.config/zellij/config.kdl`.
-Press `Alt Shift w` to open a terminal-native floating picker inside Zellij.
-It lists project tabs that exist in both sessions, and choosing one switches
-both sessions together. The picker uses `whiptail`, does not require X or a
-desktop session, and works over SSH.
+current directory. Press `Alt Shift w` to open a terminal-native floating
+picker inside Zellij. It lists project tabs that exist in both sessions, and
+choosing one switches both sessions together. The picker uses `whiptail`, does
+not require X or a desktop session, and works over SSH.
+
+These bindings are not installed automatically. Add them inside the existing
+`shared_except "locked"` block in `~/.config/zellij/config.kdl`, changing the
+repository path if you cloned it somewhere else:
+
+```kdl
+bind "Alt w" {
+    WriteChars "/home/rogerio/Projects/nvim-zellij-workbench/bin/dual-workbench \"$PWD\""
+    Write 13
+}
+
+bind "Alt Shift w" {
+    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/workbench-picker" {
+        floating true
+        close_on_exit true
+        x "15%"
+        y "15%"
+        width "70%"
+        height "70%"
+    }
+}
+```
 
 If run from inside Zellij, the command adds the workbench as a new tab. The
 first Neovim launch downloads plugins and may take a minute.

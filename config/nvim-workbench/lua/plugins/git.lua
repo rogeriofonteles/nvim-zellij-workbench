@@ -19,8 +19,14 @@ return {
       "nvim-telescope/telescope.nvim",
     },
     opts = {
+      disable_line_numbers = false,
+      disable_relative_line_numbers = true,
       integrations = { diffview = true, telescope = true },
       graph_style = "unicode",
+      commit_editor = {
+        show_staged_diff = true,
+        staged_diff_split_kind = "auto",
+      },
     },
   },
   {
