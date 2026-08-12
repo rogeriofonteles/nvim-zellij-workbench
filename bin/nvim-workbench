@@ -4,5 +4,10 @@ set -euo pipefail
 workbench_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export XDG_CONFIG_HOME="$workbench_root/config"
 export NVIM_APPNAME="nvim-workbench"
+nvim_nightly_root="${XDG_DATA_HOME:-$HOME/.local/share}/nvim-workbench/neovim-nightly"
 
-exec nvim "$@"
+if [[ ! -x "$nvim_nightly_root/bin/nvim" ]]; then
+  "$workbench_root/bin/install-neovim-nightly"
+fi
+
+exec "$nvim_nightly_root/bin/nvim" "$@"

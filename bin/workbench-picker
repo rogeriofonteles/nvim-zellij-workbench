@@ -13,7 +13,8 @@ done
 
 session_exists() {
   local session="$1"
-  zellij list-sessions --short 2>/dev/null | grep -Fxq "$session"
+  zellij list-sessions --no-formatting 2>/dev/null \
+    | awk -v session="$session" '$1 == session && index($0, "(EXITED") == 0 { found = 1 } END { exit !found }'
 }
 
 if ! session_exists "$editor_session" || ! session_exists "$agent_session"; then

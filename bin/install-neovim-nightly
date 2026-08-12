@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+case "$(uname -s)-$(uname -m)" in
+  Linux-x86_64) archive_name="nvim-linux-x86_64" ;;
+  Linux-aarch64 | Linux-arm64) archive_name="nvim-linux-arm64" ;;
+  *)
+    echo "No official Neovim nightly tarball is configured for $(uname -s) $(uname -m)." >&2
+    exit 1
+    ;;
+esac
+
+for command_name in curl tar; do
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    echo "Installing Neovim nightly requires $command_name." >&2
+    exit 1
+  fi
+done
+
+install_root="${XDG_DATA_HOME:-$HOME/.local/share}/nvim-workbench"
+nightly_root="$install_root/neovim-nightly"
+download_url="https://github.com/neovim/neovim/releases/download/nightly/$archive_name.tar.gz"
+temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/nvim-workbench-nightly.XXXXXXXX")"
+trap 'rm -rf -- "$temporary_root"' EXIT
+
+echo "Downloading the latest Neovim nightly..."
+curl --fail --location --retry 3 --output "$temporary_root/nightly.tar.gz" "$download_url"
+tar -xzf "$temporary_root/nightly.tar.gz" -C "$temporary_root"
+
+mkdir -p "$install_root"
+rm -rf -- "$nightly_root.previous"
+if [[ -e "$nightly_root" ]]; then
+  mv -- "$nightly_root" "$nightly_root.previous"
+fi
+mv -- "$temporary_root/$archive_name" "$nightly_root"
+rm -rf -- "$nightly_root.previous"
+
+"$nightly_root/bin/nvim" --version | head -n 1

@@ -21,7 +21,13 @@ done
 
 session_exists() {
   local session="$1"
-  zellij list-sessions --short 2>/dev/null | grep -Fxq "$session"
+  zellij list-sessions --no-formatting 2>/dev/null \
+    | awk -v session="$session" '$1 == session && index($0, "(EXITED") == 0 { found = 1 } END { exit !found }'
+}
+
+saved_session_exists() {
+  local session="$1"
+  zellij list-sessions --short --no-formatting 2>/dev/null | grep -Fxq "$session"
 }
 
 tab_exists() {
@@ -68,7 +74,11 @@ launch_session_window() {
   printf -v command \
     'cd %q && exec zellij attach --create %q options --default-layout %q --default-cwd %q' \
     "$project" "$session" "$layout" "$project"
-  gnome-terminal --window --title="$title" -- bash -lc "$command"
+  # Run actions inherit the focused pane's environment. When invoked from
+  # Codex that includes NO_COLOR=1 and CODEX_CI=1; do not let those become the
+  # base environment of the new terminal and Zellij session.
+  env -u NO_COLOR -u CODEX_CI \
+    gnome-terminal --window --title="$title" -- bash -lc "$command"
 }
 
 attach_session_window() {
@@ -77,7 +87,8 @@ attach_session_window() {
   local command
 
   printf -v command 'exec zellij attach %q' "$session"
-  gnome-terminal --window --title="$title" -- bash -lc "$command"
+  env -u NO_COLOR -u CODEX_CI \
+    gnome-terminal --window --title="$title" -- bash -lc "$command"
 }
 
 ensure_project_tab() {
@@ -88,6 +99,12 @@ ensure_project_tab() {
   local launched_window=false
 
   if ! session_exists "$session"; then
+    # Zellij retains exited sessions for resurrection. They cannot accept CLI
+    # actions, and --create would resurrect their stale panes instead of using
+    # the requested layout, so discard only this dead workbench session first.
+    if saved_session_exists "$session"; then
+      zellij delete-session "$session"
+    fi
     launch_session_window "$session" "$layout" "$title"
     launched_window=true
     wait_for_session "$session"

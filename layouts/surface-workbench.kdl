@@ -1,0 +1,32 @@
+layout {
+    tab focus=true {
+        pane size=1 borderless=true {
+            plugin location="zellij:tab-bar"
+        }
+        pane focus=true command="bash" {
+            args "-lc" "exec ~/Projects/nvim-zellij-workbench/bin/nvim-workbench ."
+            name "Neovim"
+        }
+        pane size=1 borderless=true {
+            plugin location="zellij:status-bar"
+        }
+        floating_panes {
+            pane x="0%" y=1 width="50%" height="98%" name="Git / Shell"
+            pane x="50%" y=1 width="50%" height="98%" command="bash" {
+                args "-lc" "unset NO_COLOR; if command -v zellij-codex-launch >/dev/null 2>&1; then exec zellij-codex-launch --no-alt-screen --yolo; else exec codex --no-alt-screen --yolo; fi"
+                name "Codex"
+            }
+        }
+    }
+    swap_floating_layout name="workbench-surface" {
+        floating_panes exact_panes=2 {
+            pane x="0%" y=1 width="50%" height="98%"
+            pane x="50%" y=1 width="50%" height="98%"
+        }
+        floating_panes exact_panes=3 {
+            pane x="0%" y=1 width="50%" height="98%"
+            pane x="50%" y=1 width="50%" height="98%"
+            pane x="25%" y="25%" width="50%" height="50%"
+        }
+    }
+}

@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workbench_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+project="${1:-$PWD}"
+project="$(cd "$project" && pwd)"
+project_name="$(basename "$project")"
+project_slug="$(printf '%s' "$project_name" | tr -cs '[:alnum:]_.-' '-')"
+tab_name="surface-$project_slug"
+session="work-$tab_name"
+layout="$workbench_root/layouts/surface-workbench.kdl"
+
+if ! command -v zellij >/dev/null 2>&1; then
+  echo "surface-workbench requires zellij." >&2
+  exit 1
+fi
+
+cd "$project"
+
+if [[ -n "${ZELLIJ:-}" ]]; then
+  if zellij action query-tab-names 2>/dev/null | grep -Fxq "$tab_name"; then
+    exec zellij action go-to-tab-name "$tab_name"
+  fi
+
+  exec zellij action new-tab \
+    --cwd "$project" \
+    --layout "$layout" \
+    --name "$tab_name"
+fi
+
+exec zellij --session "$session" --layout "$layout"

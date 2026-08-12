@@ -39,11 +39,27 @@ Zellij sessions. Each repository gets a same-named tab in both sessions.
 Running the command for another repository creates its two tabs; running it
 again switches both windows back to those existing tabs without losing state.
 
+To keep both work areas in one Zellij tab instead:
+
+```sh
+~/Projects/nvim-zellij-workbench/bin/surface-workbench ~/Projects/my-repository
+```
+
+This keeps Neovim on the tiled surface and Git/shell plus Codex in two
+full-height halves on the floating surface. Together the two floating panes
+cover Neovim while leaving Zellij's status bar visible at the bottom. Press
+`Alt f` to show or hide the floating surface; its processes keep running while
+it is hidden.
+
 From Zellij, press `Alt w` to run `dual-workbench` for the focused pane's
 current directory. Press `Alt Shift w` to open a terminal-native floating
 picker inside Zellij. It lists project tabs that exist in both sessions, and
 choosing one switches both sessions together. The picker uses `whiptail`, does
 not require X or a desktop session, and works over SSH.
+
+Press `Alt t` to open this repository in a single workbench tab.
+The first press creates the tab; later presses switch back to it. Inside that
+tab, `Alt f` toggles between full-size Neovim and the Git/Codex surface.
 
 These bindings are not installed automatically. Add them inside the existing
 `shared_except "locked"` block in `~/.config/zellij/config.kdl`, changing the
@@ -51,8 +67,17 @@ repository path if you cloned it somewhere else:
 
 ```kdl
 bind "Alt w" {
-    WriteChars "/home/rogerio/Projects/nvim-zellij-workbench/bin/dual-workbench \"$PWD\""
-    Write 13
+    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/dual-workbench" {
+        floating true
+        close_on_exit true
+    }
+}
+
+bind "Alt t" {
+    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/surface-workbench" "/home/rogerio/Projects/nvim-zellij-workbench" {
+        floating true
+        close_on_exit true
+    }
 }
 
 bind "Alt Shift w" {
@@ -68,7 +93,16 @@ bind "Alt Shift w" {
 ```
 
 If run from inside Zellij, the command adds the workbench as a new tab. The
-first Neovim launch downloads plugins and may take a minute.
+first Neovim launch downloads the official Neovim nightly build and plugins,
+so it may take a minute. The nightly is isolated under
+`~/.local/share/nvim-workbench/neovim-nightly` and includes the fix from
+[Neovim PR #33410](https://github.com/neovim/neovim/pull/33410).
+
+Update the workbench to the latest nightly at any time with:
+
+```sh
+~/Projects/nvim-zellij-workbench/bin/install-neovim-nightly
+```
 
 Optionally apply useful global Git defaults (review the script first):
 
