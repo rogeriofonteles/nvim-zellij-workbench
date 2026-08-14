@@ -4,12 +4,35 @@ set -euo pipefail
 workbench_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 project="${1:-$PWD}"
 project="$(cd "$project" && pwd)"
-session="work-$(basename "$project" | tr -cs '[:alnum:]_-' '-')"
+project_name="$(basename "$project")"
+project_slug="$(printf '%s' "$project_name" | tr -cs '[:alnum:]_.-' '-')"
+tab_name="code-$project_slug"
+session="work-$tab_name"
+layout="$workbench_root/layouts/workbench.kdl"
+
+# shellcheck source=bin/workbench-lib
+source "$workbench_root/bin/workbench-lib"
+
+if ! command -v zellij >/dev/null 2>&1; then
+  echo "workbench requires zellij." >&2
+  exit 1
+fi
+
+layout_string="$(workbench_render_layout \
+  "$layout" "$workbench_root/bin/nvim-workbench" "$tab_name")"
 
 cd "$project"
-export ZELLIJ_WORKBENCH_CWD="$project"
 if [[ -n "${ZELLIJ:-}" ]]; then
-  exec zellij --layout "$workbench_root/layouts/workbench.kdl"
-else
-  exec zellij --session "$session" --layout "$workbench_root/layouts/workbench.kdl"
+  if zellij action query-tab-names 2>/dev/null | grep -Fxq "$tab_name"; then
+    exec zellij action go-to-tab-name "$tab_name"
+  fi
+
+  new_tab_id="$(zellij action new-tab \
+    --cwd "$project" \
+    --layout-string "$layout_string" \
+    --name "$tab_name")"
+  zellij action rename-tab --tab-id "$new_tab_id" "$tab_name" >/dev/null
+  exec zellij action go-to-tab-name "$tab_name"
 fi
+
+exec zellij --session "$session" --layout-string "$layout_string"

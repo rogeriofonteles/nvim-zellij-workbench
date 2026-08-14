@@ -6,9 +6,12 @@ project="${1:-$PWD}"
 project="$(cd "$project" && pwd)"
 project_name="$(basename "$project")"
 project_slug="$(printf '%s' "$project_name" | tr -cs '[:alnum:]_.-' '-')"
-tab_name="surface-$project_slug"
-session="work-$tab_name"
+tab_name="$project_slug"
+session="work-surface-$project_slug"
 layout="$workbench_root/layouts/surface-workbench.kdl"
+
+# shellcheck source=bin/workbench-lib
+source "$workbench_root/bin/workbench-lib"
 
 if ! command -v zellij >/dev/null 2>&1; then
   echo "surface-workbench requires zellij." >&2
@@ -16,16 +19,20 @@ if ! command -v zellij >/dev/null 2>&1; then
 fi
 
 cd "$project"
+layout_string="$(workbench_render_layout \
+  "$layout" "$workbench_root/bin/nvim-workbench" "$tab_name")"
 
 if [[ -n "${ZELLIJ:-}" ]]; then
   if zellij action query-tab-names 2>/dev/null | grep -Fxq "$tab_name"; then
     exec zellij action go-to-tab-name "$tab_name"
   fi
 
-  exec zellij action new-tab \
+  new_tab_id="$(zellij action new-tab \
     --cwd "$project" \
-    --layout "$layout" \
-    --name "$tab_name"
+    --layout-string "$layout_string" \
+    --name "$tab_name")"
+  zellij action rename-tab --tab-id "$new_tab_id" "$tab_name" >/dev/null
+  exec zellij action go-to-tab-name "$tab_name"
 fi
 
-exec zellij --session "$session" --layout "$layout"
+exec zellij --session "$session" --layout-string "$layout_string"

@@ -16,30 +16,24 @@ or `~/.config/zellij`.
 
 ## Start
 
-Open any repository in a new workbench session:
+Open any repository in a Neovim workbench:
 
 ```sh
 ~/Projects/nvim-zellij-workbench/bin/workbench ~/Projects/my-repository
 ```
 
-To open the complete two-window environment instead:
+To open the complete Neovim, shell, and Codex environment:
 
 ```sh
 ~/Projects/nvim-zellij-workbench/bin/dual-workbench ~/Projects/my-repository
 ```
 
-This opens two persistent GNOME Terminal windows:
+`dual-workbench` is terminal-native: inside Zellij it opens a new project tab
+instead of launching another terminal window. Outside Zellij it starts a
+project session in the current terminal. It works in a VM or over SSH and does
+not require GNOME Terminal or `wmctrl`.
 
-1. A full-screen Neovim Zellij session.
-2. A separate Zellij session with Git/shell on the left and Codex on the
-   right, launched as `codex --no-alt-screen --yolo`.
-
-The windows attach to the long-lived `workbench-v2-editor` and `workbench-v2-agent`
-Zellij sessions. Each repository gets a same-named tab in both sessions.
-Running the command for another repository creates its two tabs; running it
-again switches both windows back to those existing tabs without losing state.
-
-To keep both work areas in one Zellij tab instead:
+`surface-workbench` is the direct name for the same combined layout:
 
 ```sh
 ~/Projects/nvim-zellij-workbench/bin/surface-workbench ~/Projects/my-repository
@@ -52,10 +46,8 @@ cover Neovim while leaving Zellij's status bar visible at the bottom. Press
 it is hidden.
 
 From Zellij, press `Alt w` to run `dual-workbench` for the focused pane's
-current directory. Press `Alt Shift w` to open a terminal-native floating
-picker inside Zellij. It lists project tabs that exist in both sessions, and
-choosing one switches both sessions together. The picker uses `whiptail`, does
-not require X or a desktop session, and works over SSH.
+current directory. The first press creates the project tab; later presses
+switch back to it without losing its processes.
 
 Press `Alt t` to open this repository in a single workbench tab.
 The first press creates the tab; later presses switch back to it. Inside that
@@ -74,29 +66,35 @@ bind "Alt w" {
 }
 
 bind "Alt t" {
-    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/surface-workbench" "/home/rogerio/Projects/nvim-zellij-workbench" {
+    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/surface-workbench" {
         floating true
         close_on_exit true
-    }
-}
-
-bind "Alt Shift w" {
-    Run "/home/rogerio/Projects/nvim-zellij-workbench/bin/workbench-picker" {
-        floating true
-        close_on_exit true
-        x "15%"
-        y "15%"
-        width "70%"
-        height "70%"
     }
 }
 ```
 
-If run from inside Zellij, the command adds the workbench as a new tab. The
-first Neovim launch downloads the official Neovim nightly build and plugins,
-so it may take a minute. The nightly is isolated under
-`~/.local/share/nvim-workbench/neovim-nightly` and includes the fix from
+Use `Run` here rather than `WriteChars`: the latter types the command into the
+focused application, so it fails when the focused pane is Neovim instead of a
+shell. `Run` inherits the focused pane's working directory.
+
+The layout resolves `nvim-workbench` from the current clone, so the repository
+can live anywhere. The first Neovim launch downloads the official Neovim
+nightly build and plugins, so it may take a minute. The nightly is isolated
+under `~/.local/share/nvim-workbench/neovim-nightly` and includes the fix from
 [Neovim PR #33410](https://github.com/neovim/neovim/pull/33410).
+
+### SSH terminal colors
+
+SSH forwards the client's `TERM` when allocating a pseudo-terminal, but it
+does not normally forward `COLORTERM`. If an SSH session reports only the
+legacy `TERM=screen`, start Fish with explicit modern capabilities:
+
+```sh
+ssh -t user@host 'env TERM=screen-256color COLORTERM=truecolor fish -l'
+```
+
+The workbench also applies this correction specifically to the Codex pane when
+it receives `TERM=screen`. It preserves any other `TERM` value.
 
 Update the workbench to the latest nightly at any time with:
 

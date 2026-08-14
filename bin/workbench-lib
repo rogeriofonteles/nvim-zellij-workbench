@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Shared helpers for turning the repository's layout templates into portable
+# Zellij layouts. Keeping the executable path in the template made every clone
+# except the original ~/Projects checkout fail at runtime.
+
+workbench_kdl_string() {
+  local value="$1"
+
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\t'/\\t}"
+  printf '"%s"' "$value"
+}
+
+workbench_render_layout() {
+  local layout_path="$1"
+  local nvim_command="$2"
+  local tab_name="$3"
+  local nvim_value tab_value line
+
+  nvim_value="$(workbench_kdl_string "$nvim_command")"
+  tab_value="$(workbench_kdl_string "$tab_name")"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == *'__NVIM_WORKBENCH_COMMAND__'* ]]; then
+      line="${line%%__NVIM_WORKBENCH_COMMAND__*}${nvim_value}${line#*__NVIM_WORKBENCH_COMMAND__}"
+    fi
+    if [[ "$line" == *'__WORKBENCH_TAB_NAME__'* ]]; then
+      line="${line%%__WORKBENCH_TAB_NAME__*}${tab_value}${line#*__WORKBENCH_TAB_NAME__}"
+    fi
+    printf '%s\n' "$line"
+  done < "$layout_path"
+}
