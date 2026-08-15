@@ -39,6 +39,15 @@ end
 return {
   {
     "folke/snacks.nvim",
+    opts = {
+      picker = {
+        sources = {
+          explorer = {
+            hidden = true,
+          },
+        },
+      },
+    },
     keys = {
       { "<leader>e", focus_explorer, desc = "Focus explorer" },
       { "<leader>E", focus_editor, desc = "Focus editor" },

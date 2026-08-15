@@ -3,6 +3,29 @@
 An isolated, opt-in coding environment. It does not replace `~/.config/nvim`
 or `~/.config/zellij`.
 
+## Requirements
+
+The Snacks file explorer requires [`fd`](https://github.com/sharkdp/fd) to
+discover files. Install it and ensure the `fd` executable is on `PATH` before
+starting the workbench:
+
+```sh
+brew install fd
+```
+
+On Ubuntu, the package is named `fd-find` and installs the executable as
+`fdfind`. Add an `fd` symlink somewhere on `PATH` after installing it:
+
+```sh
+sudo apt install fd-find
+mkdir -p ~/.local/bin
+ln -s "$(command -v fdfind)" ~/.local/bin/fd
+```
+
+The explorer shows hidden files such as `.github` by default. Press `Space e`
+to focus the file list, `/` to focus its search input, `H` to toggle hidden
+files, and `I` to toggle files excluded by Git ignore rules.
+
 ## Why this stack
 
 - **LazyVim** supplies modern editing, completion, LSP, search, and navigation.
