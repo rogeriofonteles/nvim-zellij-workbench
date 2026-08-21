@@ -1,5 +1,8 @@
 local map = vim.keymap.set
 
+map("n", "<C-z>", "u", { desc = "Undo" })
+map("i", "<C-z>", "<C-o>u", { desc = "Undo" })
+
 map("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Git status / operations" })
 map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Diff working tree" })
 map("n", "<leader>gD", "<cmd>DiffviewClose<cr>", { desc = "Close diff view" })

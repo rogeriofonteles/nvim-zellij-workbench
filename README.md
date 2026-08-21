@@ -62,11 +62,13 @@ not require GNOME Terminal or `wmctrl`.
 ~/Projects/nvim-zellij-workbench/bin/surface-workbench ~/Projects/my-repository
 ```
 
-This keeps Neovim on the tiled surface and Git/shell plus Codex in two
-full-height halves on the floating surface. Together the two floating panes
-cover Neovim while leaving Zellij's status bar visible at the bottom. Press
-`Alt f` to show or hide the floating surface; its processes keep running while
-it is hidden.
+This opens Git/shell and Codex as two tiled, full-height halves. Neovim runs in
+a full-size floating pane that starts hidden. Press `Alt f` to show Neovim over
+the terminal surface or return to Git/Codex; all three processes keep running.
+
+Because Git/Codex are tiled, `Ctrl p`, then `s` uses Zellij's native stack in
+whichever terminal pane currently has focus. The stack remains attached to
+that pane when the terminal is resized.
 
 From Zellij, press `Alt w` to run `dual-workbench` for the focused pane's
 current directory. The first press creates the project tab; later presses
@@ -74,7 +76,7 @@ switch back to it without losing its processes.
 
 Press `Alt t` to open this repository in a single workbench tab.
 The first press creates the tab; later presses switch back to it. Inside that
-tab, `Alt f` toggles between full-size Neovim and the Git/Codex surface.
+tab, `Alt f` toggles the full-size Neovim overlay.
 
 These bindings are not installed automatically. Add them inside the existing
 `shared_except "locked"` block in `~/.config/zellij/config.kdl`, changing the
@@ -131,6 +133,14 @@ Optionally apply useful global Git defaults (review the script first):
 ~/Projects/nvim-zellij-workbench/bin/git-quality-setup
 ```
 
+### Markdown preview
+
+The workbench installs
+[`iamcco/markdown-preview.nvim`](https://github.com/iamcco/markdown-preview.nvim)
+through Lazy.nvim. Open a Markdown file and press `Space m p` to toggle its
+live preview in your browser. The mapping is available only in Markdown
+buffers.
+
 ## Daily keys
 
 LazyVim uses Space as `<leader>`.
@@ -147,6 +157,8 @@ LazyVim uses Space as `<leader>`.
 | `Space g h` | History of the current file |
 | `Space g H` | Repository history |
 | `Space g b` | Blame the current line |
+| `Space m p` | Toggle the current Markdown file's browser preview |
+| `Ctrl z` | Undo without suspending Neovim |
 | `]c` / `[c` | Next/previous change in diff mode |
 | `Tab` / `Shift-Tab` | Next/previous changed file in Diffview |
 
