@@ -20,4 +20,13 @@ layout {
             }
         }
     }
+    swap_floating_layout name="workbench" {
+        floating_panes exact_panes=1 {
+            pane x="0%" y=1 width="100%" height="98%"
+        }
+        floating_panes exact_panes=2 {
+            pane x="0%" y=1 width="100%" height="98%"
+            pane x="25%" y="25%" width="50%" height="50%"
+        }
+    }
 }
