@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# shellcheck source=bin/workbench-lib
+source "$root/bin/workbench-lib"
+
+rendered="$(workbench_render_layout \
+  "$root/layouts/surface-workbench.kdl" \
+  "$root/bin/nvim-workbench" \
+  "feature-tab" \
+  '/tmp/zellij socket')"
+
+grep -Fq 'command="env"' <<<"$rendered"
+grep -Fq 'args "ZELLIJ_SOCKET_DIR=/tmp/zellij socket" "bash" "-lc"' <<<"$rendered"
+
+rendered_without_socket="$(workbench_render_layout \
+  "$root/layouts/surface-workbench.kdl" \
+  "$root/bin/nvim-workbench" \
+  "feature-tab")"
+
+grep -Fq 'args  "bash" "-lc"' <<<"$rendered_without_socket"
+if grep -Fq '__ZELLIJ_SOCKET_ENV_ARG__' <<<"$rendered_without_socket"; then
+  exit 1
+fi

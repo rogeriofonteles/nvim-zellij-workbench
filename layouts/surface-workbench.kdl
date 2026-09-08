@@ -5,8 +5,8 @@ layout {
         }
         pane split_direction="vertical" {
             pane size="50%" focus=true name="Git / Shell"
-            pane size="50%" command="bash" {
-                args "-lc" "unset NO_COLOR; if [[ ${TERM:-} == screen ]] && infocmp screen-256color >/dev/null 2>&1; then export TERM=screen-256color; fi; export COLORTERM=${COLORTERM:-truecolor}; if command -v zellij-codex-launch >/dev/null 2>&1; then exec zellij-codex-launch --yolo; else exec codex --yolo; fi"
+            pane size="50%" command="env" {
+                args __ZELLIJ_SOCKET_ENV_ARG__ "bash" "-lc" "unset NO_COLOR; if [[ ${TERM:-} == screen ]] && infocmp screen-256color >/dev/null 2>&1; then export TERM=screen-256color; fi; export COLORTERM=${COLORTERM:-truecolor}; if command -v zellij-codex-launch >/dev/null 2>&1; then exec zellij-codex-launch --yolo; else exec codex --yolo; fi"
                 name "Codex"
             }
         }
@@ -18,15 +18,6 @@ layout {
                 args "."
                 name "Neovim"
             }
-        }
-    }
-    swap_floating_layout name="workbench" {
-        floating_panes exact_panes=1 {
-            pane x="0%" y=1 width="100%" height="98%"
-        }
-        floating_panes exact_panes=2 {
-            pane x="0%" y=1 width="100%" height="98%"
-            pane x="25%" y="25%" width="50%" height="50%"
         }
     }
 }

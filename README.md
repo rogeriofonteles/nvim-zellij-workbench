@@ -65,9 +65,9 @@ not require GNOME Terminal or `wmctrl`.
 This opens Git/shell and Codex as two tiled, full-height halves. Neovim runs in
 a full-size floating pane that starts hidden. Press `Alt f` to show Neovim over
 the terminal surface or return to Git/Codex; all three processes keep running.
-The overlay tracks the terminal's current dimensions, including after another
-floating pane is opened or closed, so it adapts when the terminal is resized or
-moved between displays.
+The overlay uses percentage coordinates so it adapts when the terminal is
+resized or moved between displays. Opening or closing another floating pane
+leaves Neovim's geometry unchanged.
 
 Because Git/Codex are tiled, `Ctrl p`, then `s` uses Zellij's native stack in
 whichever terminal pane currently has focus. The stack remains attached to

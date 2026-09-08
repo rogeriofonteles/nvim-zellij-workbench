@@ -20,7 +20,8 @@ fi
 
 cd "$project"
 layout_string="$(workbench_render_layout \
-  "$layout" "$workbench_root/bin/nvim-workbench" "$tab_name")"
+  "$layout" "$workbench_root/bin/nvim-workbench" "$tab_name" \
+  "${ZELLIJ_SOCKET_DIR:-}")"
 
 if [[ -n "${ZELLIJ:-}" ]]; then
   if zellij action query-tab-names 2>/dev/null | grep -Fxq "$tab_name"; then
