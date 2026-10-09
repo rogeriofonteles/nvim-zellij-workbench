@@ -6,7 +6,7 @@ project="${1:-$PWD}"
 project="$(cd "$project" && pwd)"
 project_name="$(basename "$project")"
 project_slug="$(printf '%s' "$project_name" | tr -cs '[:alnum:]_.-' '-')"
-tab_name="$project_slug"
+tab_name="surface-$project_slug"
 session="work-surface-$project_slug"
 layout="$workbench_root/layouts/surface-workbench.kdl"
 

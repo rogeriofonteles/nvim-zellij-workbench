@@ -77,7 +77,8 @@ From Zellij, press `Alt w` to run `dual-workbench` for the focused pane's
 current directory. The first press creates the project tab; later presses
 switch back to it without losing its processes.
 
-Press `Alt t` to open this repository in a single workbench tab.
+Press `Alt t` to open this repository in a single `surface-<project>` workbench
+tab. This name keeps it separate from ordinary tabs named after the project.
 The first press creates the tab; later presses switch back to it. Inside that
 tab, `Alt f` toggles the full-size Neovim overlay.
 
