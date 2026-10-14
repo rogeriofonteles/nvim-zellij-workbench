@@ -3,6 +3,15 @@ local map = vim.keymap.set
 map("n", "<C-z>", "u", { desc = "Undo" })
 map("i", "<C-z>", "<C-o>u", { desc = "Undo" })
 
+map("n", "<leader>ac", function()
+  require("config.codex").open()
+end, { desc = "Codex for current file" })
+for _, key in ipairs({ "]w", "[w" }) do
+  map("n", key, function()
+    require("config.codex").toggle_focus()
+  end, { desc = "Switch file / Codex" })
+end
+
 map("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Git status / operations" })
 map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Diff working tree" })
 map("n", "<leader>gD", "<cmd>DiffviewClose<cr>", { desc = "Close diff view" })

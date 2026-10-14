@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+nvim_bin="${NVIM_BIN:-${XDG_DATA_HOME:-$HOME/.local/share}/nvim-workbench/neovim-nightly/bin/nvim}"
+test_dir="$(mktemp -d)"
+trap 'rm -rf "$test_dir"' EXIT
+
+cat > "$test_dir/codex" <<'PY'
+#!/usr/bin/env python3
+import json
+import os
+import pathlib
+import sys
+import time
+
+capture = pathlib.Path(os.environ['CODEX_TEST_DIR']) / f'{os.getpid()}.json'
+capture.write_text(json.dumps({'cwd': os.getcwd(), 'argv': sys.argv[1:]}))
+time.sleep(60)
+PY
+chmod +x "$test_dir/codex"
+
+PATH="$test_dir:$PATH" CODEX_TEST_DIR="$test_dir" CODEX_TEST_ROOT="$root" \
+  "$nvim_bin" --headless -u NONE -l "$root/tests/test-codex-split.lua"

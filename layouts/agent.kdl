@@ -1,7 +1,7 @@
 layout {
     tab name="agent" focus=true {
         pane size=1 borderless=true {
-            plugin location="file:/home/rogeriofonteles/.config/zellij/plugins/zellij-codex-tab-bar.wasm"
+            plugin location="file:/home/rogerio/.config/zellij/plugins/zellij-codex-tab-bar.wasm"
         }
         pane split_direction="vertical" {
             pane size="45%" focus=true name="Git / Shell"

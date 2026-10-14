@@ -155,6 +155,8 @@ LazyVim uses Space as `<leader>`.
 | `Space /` | Search text in the repository |
 | `Space e` | File explorer |
 | `Space E` | Return focus to the editor |
+| `Space a c` | Start or focus the current file's Codex session |
+| `]w` / `[w` | Switch between the file and Codex, including in terminal input mode |
 | `Space g g` | Neogit status and Git operations |
 | `Space g d` | Review unstaged/staged changes in Diffview |
 | `Space g m` | Open the merge/rebase conflict view |
@@ -168,6 +170,29 @@ LazyVim uses Space as `<leader>`.
 
 Run `:checkhealth` after first installation. Use `:Lazy` to inspect or update
 plugins and `:Mason` to install language servers and formatters.
+
+`Space a c` opens a right-hand Neovim terminal split running
+`codex --no-alt-screen --yolo` at the Git repository root (or LazyVim's project
+root outside Git). It passes the current file's absolute path as initial
+context, asking Codex to read it and wait for your instructions. Save any edits
+first so Codex sees them on disk. Open a named file before using the shortcut.
+The `codex` executable must be on `PATH`.
+
+Each file has its own session. Switching files in the editor hides its Codex
+split while the process keeps running. Returning to that file restores the
+same session; pressing the shortcut again focuses it. Codex terminals are
+excluded from the file tab list. Closing just the split also keeps the session
+alive; use the shortcut to reopen it. Sessions run for the lifetime of Neovim;
+quitting or restarting Neovim stops its terminals. Use `codex resume` to return
+to a saved conversation after that.
+
+Press `]w` or `[w` to alternate between the file and its Codex session. These
+keys work directly in Codex's terminal input mode and resume terminal input
+when switching back to Codex. `]b` and `[b` continue to switch files.
+
+Alternatively, to return to the file from the Codex terminal, press `Ctrl \\`, then `Ctrl n`
+to leave terminal input mode, followed by `Ctrl w h` to focus the left split.
+Press `i` in the terminal split to resume typing into Codex.
 
 ## Fast rebase / merge workflow
 
